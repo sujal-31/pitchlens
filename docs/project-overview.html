@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchLens — Project Architecture & Overview</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --surface: #f9fafb;
+            --border: #e5e7eb;
+            --text: #111827;
+            --text-secondary: #6b7280;
+            --brand: #E02830;
+            --brand-light: #fef2f2;
+            --code-bg: #1f2937;
+            --code-text: #e5e7eb;
+            --green: #059669;
+            --amber: #d97706;
+            --blue: #2563eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%);
+            color: white;
+            padding: 80px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 50%, rgba(224, 40, 48, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 30%, rgba(37, 99, 235, 0.06) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .hero h1 span { color: var(--brand); }
+
+        .hero p {
+            font-size: 18px;
+            color: #9ca3af;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero-badges {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #d1d5db;
+        }
+
+        /* Sections */
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        section:last-child { border-bottom: none; }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        p { margin-bottom: 16px; color: #374151; font-size: 15px; }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .card h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Architecture diagram */
+        .arch-diagram {
+            background: var(--code-bg);
+            border-radius: 12px;
+            padding: 32px;
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+
+        .arch-diagram pre {
+            color: var(--code-text);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre;
+        }
+
+        /* Flow */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 24px 0;
+            padding: 20px;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .flow-step.active {
+            background: var(--brand-light);
+            border-color: var(--brand);
+            color: var(--brand);
+        }
+
+        .flow-arrow {
+            color: #d1d5db;
+            font-size: 18px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--surface);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+        td code {
+            background: var(--surface);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        /* Tech stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .tech-item .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* File tree */
+        .file-tree {
+            background: var(--code-bg);
+            color: var(--code-text);
+            border-radius: 12px;
+            padding: 24px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 12px;
+            line-height: 2;
+            overflow-x: auto;
+        }
+
+        .file-tree .folder { color: #60a5fa; }
+        .file-tree .file { color: #9ca3af; }
+        .file-tree .highlight { color: #34d399; }
+
+        /* Use cases */
+        .usecase {
+            display: flex;
+            gap: 16px;
+            padding: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .usecase-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--brand);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            shrink: 0;
+        }
+
+        .usecase h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .usecase p { font-size: 13px; color: var(--text-secondary); margin: 0; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 28px; }
+            .hero p { font-size: 15px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .tech-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+    <h1>Pitch<span>Lens</span></h1>
+    <p>AI-powered pitch deck analyzer that delivers investor-grade scorecards using a multi-agent architecture</p>
+    <div class="hero-badges">
+        <span class="badge">⚡ Multi-Agent AI</span>
+        <span class="badge">📊 4-Dimension Scoring</span>
+        <span class="badge">🔄 Real-Time Streaming</span>
+        <span class="badge">💬 RAG-Based Chat</span>
+    </div>
+</div>
+
+<div class="container">
+
+<!-- Use Case & Relevance -->
+<section>
+    <h2>Use Case & Relevance</h2>
+    <p class="section-subtitle">Why PitchLens exists and who it serves</p>
+
+    <p>Startup founders iterate on pitch decks dozens of times before meeting investors. Each iteration requires feedback — typically expensive ($500-2000/consultation) or slow (days to weeks from mentors). PitchLens automates this feedback loop with AI that thinks like a VC analyst, delivering structured, actionable scorecards in under 60 seconds.</p>
+
+    <h3>Target Users</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon" style="background: #eff6ff;">🚀</div>
+            <h4>Startup Founders</h4>
+            <p>Get instant investor-perspective feedback before pitching. Identify weak areas and iterate faster.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #f0fdf4;">🎓</div>
+            <h4>Accelerator Programs</h4>
+            <p>Screen and evaluate cohort applications at scale. Provide structured feedback to applicants.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #fef3c7;">💼</div>
+            <h4>Angel Investors</h4>
+            <p>Quick initial screening of deal flow. Standardized scoring across opportunities.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #fce4ec;">🏫</div>
+            <h4>Business Schools</h4>
+            <p>Teaching tool for entrepreneurship courses. Students get instant AI-powered feedback on assignments.</p>
+        </div>
+    </div>
+
+    <h3>Key Value Propositions</h3>
+    <div class="usecase">
+        <div class="usecase-num">1</div>
+        <div>
+            <h4>Speed</h4>
+            <p>Full multi-dimensional analysis in ~60 seconds vs days/weeks from human reviewers. Parallel AI agents process all dimensions simultaneously.</p>
+        </div>
+    </div>
+    <div class="usecase">
+        <div class="usecase-num">2</div>
+        <div>
+            <h4>Consistency</h4>
+            <p>Standardized scoring rubric across Market, Team, Business Model, and Competition. No reviewer mood, fatigue, or bias variability.</p>
+        </div>
+    </div>
+    <div class="usecase">
+        <div class="usecase-num">3</div>
+        <div>
+            <h4>Actionability</h4>
+            <p>Each dimension includes specific improvement suggestions referencing actual deck content. Follow-up chat enables deeper exploration of any feedback point.</p>
+        </div>
+    </div>
+    <div class="usecase">
+        <div class="usecase-num">4</div>
+        <div>
+            <h4>Cost</h4>
+            <p>Democratizes access to investor-grade feedback. A single VC consultation costs $500-2000; PitchLens delivers comparable analytical depth at a fraction of the cost.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Architecture -->
+<section>
+    <h2>System Architecture</h2>
+    <p class="section-subtitle">Multi-agent pipeline with real-time streaming</p>
+
+    <div class="arch-diagram">
+<pre>
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         FRONTEND (React + TypeScript + Vite)             │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐ │
+│  │  Login   │ │  Upload  │ │ Analysis │ │Scorecard │ │  RAG Chat    │ │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────────┘ │
+│        REST API ↕              WebSocket ↕              REST API ↕       │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         BACKEND (FastAPI + Python)                        │
+│                                                                          │
+│  ┌─────────┐  ┌────────────┐  ┌──────────────┐  ┌───────────────────┐  │
+│  │  Auth   │  │Rate Limiter│  │   Injection  │  │    WebSocket      │  │
+│  │(JWT+BCR)│  │(Sliding Win)│  │    Guard     │  │    Manager        │  │
+│  └─────────┘  └────────────┘  └──────────────┘  └───────────────────┘  │
+│                                                                          │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                    PIPELINE ORCHESTRATOR                           │  │
+│  │                                                                    │  │
+│  │  ┌────────────┐       ┌────────────────────────┐    ┌─────────┐  │  │
+│  │  │ Extractor  │──────▶│  PARALLEL SCORERS (4x) │───▶│Verdict  │  │  │
+│  │  │   Agent    │       │                        │    │Aggregator│  │  │
+│  │  └────────────┘       │ ┌──────┐ ┌──────────┐ │    └─────────┘  │  │
+│  │                        │ │Market│ │   Team   │ │                   │  │
+│  │                        │ └──────┘ └──────────┘ │                   │  │
+│  │                        │ ┌──────┐ ┌──────────┐ │                   │  │
+│  │                        │ │BizMdl│ │Competition│ │                   │  │
+│  │                        │ └──────┘ └──────────┘ │                   │  │
+│  │                        └────────────────────────┘                   │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────┐                                                        │
+│  │  RAG Engine  │ (pgvector + LLM for follow-up Q&A)                    │
+│  └──────────────┘                                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         DATA LAYER                                        │
+│  ┌────────────┐  ┌────────────────┐  ┌──────────────────────────────┐  │
+│  │ PostgreSQL │  │  pgvector      │  │     File Storage (PDFs)      │  │
+│  │  (Users,   │  │  (Embeddings   │  │                              │  │
+│  │  Decks,    │  │   for RAG)     │  │                              │  │
+│  │  Scores)   │  │                │  │                              │  │
+│  └────────────┘  └────────────────┘  └──────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    EXTERNAL: LLM (Claude Sonnet via OpenAI Proxy)        │
+└─────────────────────────────────────────────────────────────────────────┘
+</pre>
+    </div>
+
+    <h3>Pipeline Execution Flow</h3>
+    <div class="flow">
+        <div class="flow-step">📄 Upload PDF</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">🔍 Extract Content</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step active">⚡ Score (4 parallel agents)</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">🧮 Aggregate Verdict</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">📊 Scorecard</div>
+    </div>
+
+    <h3>Key Architectural Decisions</h3>
+    <table>
+        <thead>
+            <tr><th>Decision</th><th>Choice</th><th>Rationale</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Agent Framework</td><td><code>CrewAI</code></td><td>Agent composition, task chaining, tool integration out of the box</td></tr>
+            <tr><td>LLM</td><td><code>Claude Sonnet</code></td><td>Strong reasoning, OpenAI-compatible proxy for standard interface</td></tr>
+            <tr><td>PDF Parsing</td><td><code>PyPDF2</code></td><td>Lightweight, pure-Python, no native deps</td></tr>
+            <tr><td>Vector Store</td><td><code>pgvector</code></td><td>Collocates embeddings with relational data — no extra infra</td></tr>
+            <tr><td>Real-Time</td><td><code>WebSocket</code></td><td>Low-latency bidirectional streaming, native FastAPI support</td></tr>
+            <tr><td>Auth</td><td><code>JWT + Refresh</code></td><td>Stateless verification, standard rotation pattern</td></tr>
+            <tr><td>Rate Limiting</td><td><code>Sliding Window</code></td><td>Simple, upgrade path to Redis for horizontal scaling</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- Tech Stack -->
+<section>
+    <h2>Technology Stack</h2>
+    <p class="section-subtitle">Production-grade tooling across the full stack</p>
+
+    <h3>Backend</h3>
+    <div class="tech-grid">
+        <div class="tech-item"><span class="dot" style="background: #059669;"></span>Python 3.11+</div>
+        <div class="tech-item"><span class="dot" style="background: #059669;"></span>FastAPI</div>
+        <div class="tech-item"><span class="dot" style="background: #059669;"></span>CrewAI (Multi-Agent)</div>
+        <div class="tech-item"><span class="dot" style="background: #059669;"></span>SQLAlchemy (Async)</div>
+        <div class="tech-item"><span class="dot" style="background: #059669;"></span>PostgreSQL + pgvector</div>
+        <div class="tech-item"><span class="dot" style="background: #059669;"></span>PyPDF2</div>
+        <div class="tech-item"><span class="dot" style="background: #059669;"></span>bcrypt + PyJWT</div>
+        <div class="tech-item"><span class="dot" style="background: #059669;"></span>pytest + Hypothesis</div>
+    </div>
+
+    <h3>Frontend</h3>
+    <div class="tech-grid">
+        <div class="tech-item"><span class="dot" style="background: #2563eb;"></span>React 19</div>
+        <div class="tech-item"><span class="dot" style="background: #2563eb;"></span>TypeScript 6</div>
+        <div class="tech-item"><span class="dot" style="background: #2563eb;"></span>Vite 8</div>
+        <div class="tech-item"><span class="dot" style="background: #2563eb;"></span>Tailwind CSS 4</div>
+        <div class="tech-item"><span class="dot" style="background: #2563eb;"></span>React Router 7</div>
+        <div class="tech-item"><span class="dot" style="background: #2563eb;"></span>WebSocket (native)</div>
+    </div>
+
+    <h3>Infrastructure</h3>
+    <div class="tech-grid">
+        <div class="tech-item"><span class="dot" style="background: #d97706;"></span>Claude Sonnet (LLM)</div>
+        <div class="tech-item"><span class="dot" style="background: #d97706;"></span>OpenAI-Compatible Proxy</div>
+        <div class="tech-item"><span class="dot" style="background: #d97706;"></span>PostgreSQL 15+</div>
+    </div>
+</section>
+
+<!-- Project Structure -->
+<section>
+    <h2>Project Structure</h2>
+    <p class="section-subtitle">Organized by domain with clear separation of concerns</p>
+
+    <div class="file-tree">
+<span class="folder">pitchlens/</span>
+├── <span class="folder">app/</span>                          # Backend application
+│   ├── <span class="file">main.py</span>                   # FastAPI app entry point
+│   ├── <span class="folder">agents/</span>                   # CrewAI agent definitions
+│   │   ├── <span class="highlight">extractor.py</span>          # PDF → structured content
+│   │   ├── <span class="highlight">market_scorer.py</span>      # Market opportunity scoring
+│   │   ├── <span class="highlight">team_scorer.py</span>        # Team strength scoring
+│   │   ├── <span class="highlight">business_model_scorer.py</span> # Business model scoring
+│   │   ├── <span class="highlight">competition_scorer.py</span> # Competitive edge scoring
+│   │   ├── <span class="highlight">verdict_aggregator.py</span> # Final scorecard generation
+│   │   └── <span class="file">llm_config.py</span>         # Shared LLM configuration
+│   ├── <span class="folder">api/</span>                      # REST API routes
+│   │   ├── <span class="file">auth.py</span>               # Register, login, refresh
+│   │   ├── <span class="file">decks.py</span>              # Upload, scorecard, chat
+│   │   ├── <span class="file">evaluations.py</span>        # History & pagination
+│   │   ├── <span class="file">ws.py</span>                 # WebSocket endpoint
+│   │   └── <span class="file">dependencies.py</span>       # Auth dependency injection
+│   ├── <span class="folder">db/</span>                       # Database layer
+│   │   ├── <span class="file">database.py</span>           # Async session factory
+│   │   ├── <span class="file">models.py</span>             # SQLAlchemy ORM models
+│   │   └── <span class="folder">migrations/</span>           # Schema migrations
+│   ├── <span class="folder">middleware/</span>               # Request middleware
+│   │   └── <span class="file">rate_limiter.py</span>       # Sliding window rate limiting
+│   ├── <span class="folder">models/</span>                   # Pydantic schemas
+│   │   └── <span class="file">schemas.py</span>            # Request/response models
+│   └── <span class="folder">services/</span>                 # Business logic
+│       ├── <span class="file">auth.py</span>               # JWT + bcrypt operations
+│       ├── <span class="file">orchestrator.py</span>       # Pipeline lifecycle mgmt
+│       ├── <span class="file">ws_manager.py</span>         # WebSocket connection mgmt
+│       ├── <span class="file">rag_engine.py</span>         # RAG retrieval + chat
+│       ├── <span class="file">injection_guard.py</span>    # Prompt injection scanner
+│       └── <span class="file">scorecard_service.py</span>  # Scorecard persistence
+├── <span class="folder">frontend/</span>                     # React SPA
+│   ├── <span class="folder">src/</span>
+│   │   ├── <span class="file">App.tsx</span>               # App shell + routing
+│   │   ├── <span class="folder">pages/</span>                # Route-level components
+│   │   │   ├── <span class="file">LoginPage.tsx</span>
+│   │   │   ├── <span class="file">RegisterPage.tsx</span>
+│   │   │   ├── <span class="file">UploadPage.tsx</span>
+│   │   │   ├── <span class="file">AnalysisPage.tsx</span>   # Real-time progress
+│   │   │   ├── <span class="file">ScorecardPage.tsx</span>
+│   │   │   └── <span class="file">HistoryPage.tsx</span>
+│   │   ├── <span class="folder">components/</span>           # Shared UI components
+│   │   ├── <span class="folder">hooks/</span>                # Custom hooks (WebSocket)
+│   │   ├── <span class="folder">contexts/</span>             # Auth context provider
+│   │   ├── <span class="folder">lib/</span>                  # API client, utilities
+│   │   └── <span class="folder">types/</span>                # TypeScript interfaces
+│   ├── <span class="file">vite.config.ts</span>
+│   └── <span class="file">package.json</span>
+├── <span class="folder">tests/</span>                        # Backend test suite
+│   ├── <span class="file">conftest.py</span>
+│   ├── <span class="file">test_auth_*.py</span>
+│   ├── <span class="file">test_evaluation_*.py</span>
+│   └── ...
+├── <span class="file">requirements.txt</span>
+└── <span class="file">.env</span>
+    </div>
+</section>
+
+<!-- Scoring Dimensions -->
+<section>
+    <h2>AI Scoring Dimensions</h2>
+    <p class="section-subtitle">Four specialized AI agents evaluate distinct aspects of the pitch</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon" style="background: #eff6ff; color: #2563eb;">🌍</div>
+            <h4>Market Opportunity</h4>
+            <p>TAM/SAM/SOM analysis, market timing, growth potential evidence, market size specificity</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #f0fdf4; color: #059669;">👥</div>
+            <h4>Team Strength</h4>
+            <p>Founder backgrounds, relevant domain experience, team completeness, advisory board quality</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #fef3c7; color: #d97706;">💰</div>
+            <h4>Business Model</h4>
+            <p>Revenue model clarity, unit economics, scalability potential, monetization strategy</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #fce4ec; color: #dc2626;">⚔️</div>
+            <h4>Competitive Edge</h4>
+            <p>Competitive landscape awareness, differentiation strength, defensibility/moat</p>
+        </div>
+    </div>
+
+    <h3>Scoring Output Per Dimension</h3>
+    <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr><td>Score</td><td><code>int (1-10)</code></td><td>Numeric evaluation on a standardized scale</td></tr>
+            <tr><td>Reasoning</td><td><code>string (50-500 words)</code></td><td>Detailed explanation referencing deck content</td></tr>
+            <tr><td>Suggestions</td><td><code>string[] (1-3 items)</code></td><td>Actionable improvements specific to the deck</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- Security -->
+<section>
+    <h2>Security Architecture</h2>
+    <p class="section-subtitle">Defense-in-depth approach across all layers</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon" style="background: #fef3c7;">🔐</div>
+            <h4>JWT Authentication</h4>
+            <p>15-min access tokens + 7-day refresh tokens. Bcrypt password hashing. Stateless verification.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #fef3c7;">🛡️</div>
+            <h4>Prompt Injection Guard</h4>
+            <p>Pattern-based scanner blocks role-override, system-prompt extraction, and delimiter escape attacks. Fail-closed design.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #fef3c7;">⏱️</div>
+            <h4>Rate Limiting</h4>
+            <p>10 analyses/hour, 60 API calls/minute per user. Sliding window counters. 429 + Retry-After headers.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: #fef3c7;">🔒</div>
+            <h4>Data Isolation</h4>
+            <p>Per-user data ownership. 403 without existence revelation. Cross-user access logging.</p>
+        </div>
+    </div>
+</section>
+
+<!-- API -->
+<section>
+    <h2>API Surface</h2>
+    <p class="section-subtitle">RESTful endpoints with WebSocket streaming</p>
+
+    <table>
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Purpose</th></tr></thead>
+        <tbody>
+            <tr><td><code>POST</code></td><td><code>/api/auth/register</code></td><td>No</td><td>Create account</td></tr>
+            <tr><td><code>POST</code></td><td><code>/api/auth/login</code></td><td>No</td><td>Get tokens</td></tr>
+            <tr><td><code>POST</code></td><td><code>/api/auth/refresh</code></td><td>No</td><td>Rotate access token</td></tr>
+            <tr><td><code>POST</code></td><td><code>/api/decks</code></td><td>JWT</td><td>Upload PDF + start analysis</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/decks/{id}/scorecard</code></td><td>JWT</td><td>Retrieve scorecard</td></tr>
+            <tr><td><code>POST</code></td><td><code>/api/decks/{id}/chat</code></td><td>JWT</td><td>RAG follow-up question</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/evaluations</code></td><td>JWT</td><td>Paginated history</td></tr>
+            <tr><td><code>WS</code></td><td><code>/ws/analysis/{id}</code></td><td>JWT (query)</td><td>Real-time progress stream</td></tr>
+        </tbody>
+    </table>
+</section>
+
+</div>
+
+<footer>
+    <p>PitchLens — Built with FastAPI, CrewAI, React & Claude Sonnet</p>
+    <p style="margin-top: 4px; font-size: 12px; color: #9ca3af;">Project documentation generated July 2026</p>
+</footer>
+
+</body>
+</html>
