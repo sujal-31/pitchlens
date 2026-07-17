@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchLens — Learning Guide & Reference</title>
+    <style>
+        :root { --bg: #fff; --surface: #f8fafc; --border: #e2e8f0; --text: #0f172a; --muted: #64748b; --brand: #DC2626; --code-bg: #1e293b; --code-text: #e2e8f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); background: var(--bg); line-height: 1.8; }
+        .container { max-width: 860px; margin: 0 auto; padding: 48px 24px; }
+        h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+        h2 { font-size: 22px; font-weight: 700; margin-top: 48px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+        h3 { font-size: 16px; font-weight: 600; margin-top: 28px; margin-bottom: 8px; color: var(--brand); }
+        h4 { font-size: 14px; font-weight: 600; margin-top: 20px; margin-bottom: 6px; }
+        p, li { font-size: 14.5px; color: #334155; }
+        p { margin-bottom: 12px; }
+        ul, ol { padding-left: 24px; margin-bottom: 16px; }
+        li { margin-bottom: 6px; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', 'Fira Code', monospace; }
+        pre { background: var(--code-bg); color: var(--code-text); padding: 20px; border-radius: 10px; overflow-x: auto; margin: 16px 0; font-size: 13px; line-height: 1.6; }
+        pre code { background: none; padding: 0; color: inherit; }
+        .subtitle { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+        .card-title { font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+        .tag { display: inline-block; background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 4px; }
+        .tag-blue { background: #dbeafe; color: #1e40af; }
+        .tag-green { background: #dcfce7; color: #166534; }
+        .tag-purple { background: #ede9fe; color: #5b21b6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+        th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+        th { background: var(--surface); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+        a { color: var(--brand); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin: 24px 0; }
+        .toc h3 { margin-top: 0; color: var(--text); }
+        .toc ol { margin-bottom: 0; }
+        .toc li { font-size: 13px; }
+        hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+        .highlight { background: #fef3c7; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #f59e0b; margin: 16px 0; font-size: 13px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>PitchLens — Learning Guide</h1>
+<p class="subtitle">Everything you learned building this project, organized for future reference.</p>
+
+<div class="toc">
+<h3>Table of Contents</h3>
+<ol>
+    <li><a href="#concepts">Core Concepts You Learned</a></li>
+    <li><a href="#fastapi">FastAPI Deep Dive</a></li>
+    <li><a href="#agents">Multi-Agent Systems (CrewAI)</a></li>
+    <li><a href="#orchestration">Pipeline Orchestration Patterns</a></li>
+    <li><a href="#websocket">WebSocket Real-Time Streaming</a></li>
+    <li><a href="#rag">RAG (Retrieval-Augmented Generation)</a></li>
+    <li><a href="#auth">JWT Authentication</a></li>
+    <li><a href="#security">Security Patterns</a></li>
+    <li><a href="#frontend">React + TypeScript Patterns</a></li>
+    <li><a href="#db">PostgreSQL + pgvector</a></li>
+    <li><a href="#testing">Testing Strategy</a></li>
+    <li><a href="#deployment">Deployment & DevOps</a></li>
+    <li><a href="#resources">Resources & Further Reading</a></li>
+</ol>
+</div>
+
+<h2 id="concepts">1. Core Concepts You Learned</h2>
+
+<div class="card">
+<p class="card-title">What this project covers:</p>
+<p>
+<span class="tag">Multi-Agent AI</span>
+<span class="tag-blue tag">Real-Time Streaming</span>
+<span class="tag-green tag">RAG</span>
+<span class="tag-purple tag">Pipeline Orchestration</span>
+<span class="tag">Security</span>
+<span class="tag-blue tag">Full-Stack</span>
+</p>
+</div>
+
+<ul>
+    <li><strong>Multi-agent orchestration</strong> — Running specialized AI agents in parallel with retry logic and graceful degradation</li>
+    <li><strong>Pipeline architecture</strong> — Sequential stages (extract → score → aggregate) with parallel execution within stages</li>
+    <li><strong>Real-time systems</strong> — WebSocket-based bidirectional communication with heartbeats and reconnection</li>
+    <li><strong>RAG</strong> — Vector embeddings + semantic retrieval + LLM generation for grounded Q&A</li>
+    <li><strong>Async Python</strong> — asyncio, async/await, event loops, executors for CPU-bound work</li>
+    <li><strong>API design</strong> — RESTful endpoints, proper HTTP status codes, pagination, error handling</li>
+    <li><strong>Security</strong> — JWT auth, prompt injection detection, rate limiting, fail-closed patterns</li>
+    <li><strong>Frontend state management</strong> — React hooks, context, WebSocket hooks, optimistic updates</li>
+</ul>
+
+<h2 id="fastapi">2. FastAPI Deep Dive</h2>
+
+<h3>Why FastAPI?</h3>
+<p>FastAPI gives you async Python, automatic OpenAPI docs, Pydantic validation, and dependency injection — all in one framework. It's the modern standard for Python APIs.</p>
+
+<h3>Key Patterns Used</h3>
+
+<h4>Dependency Injection</h4>
+<pre><code># app/api/dependencies.py
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    """Injected into every protected route automatically."""
+    payload = verify_jwt(token)
+    user = await get_user_by_id(payload["sub"])
+    if not user:
+        raise HTTPException(status_code=401)
+    return user
+
+# Usage in routes:
+@router.get("/api/decks/{id}/scorecard")
+async def get_scorecard(
+    current_user: User = Depends(get_current_user),  # auto-injected
+    db: AsyncSession = Depends(get_db),              # auto-injected
+):
+    ...</code></pre>
+
+<h4>Background Tasks</h4>
+<pre><code># Start analysis pipeline without blocking the upload response
+@router.post("/api/decks")
+async def upload_deck(file: UploadFile, background_tasks: BackgroundTasks):
+    deck = await save_deck(file)
+    background_tasks.add_task(run_pipeline, deck.id, analysis.id, user.id, pdf_bytes)
+    return {"deck_id": deck.id, "analysis_id": analysis.id}  # returns immediately</code></pre>
+
+<h4>Pydantic Models for Validation</h4>
+<pre><code>class CategoryScore(BaseModel):
+    category: str
+    score: int = Field(ge=1, le=10)  # validated automatically
+    reasoning: str = Field(min_length=50, max_length=500)
+    suggestions: List[str] = Field(min_length=1, max_length=3)</code></pre>
+
+<div class="highlight">
+<strong>Key lesson:</strong> FastAPI's <code>Depends()</code> system is incredibly powerful. It handles auth, DB sessions, rate limiting — all composable and testable independently.
+</div>
+
+<h2 id="agents">3. Multi-Agent Systems (CrewAI)</h2>
+
+<h3>What is a multi-agent system?</h3>
+<p>Instead of one monolithic LLM call, you create specialized "agents" — each with a focused role, expertise, and goal. They work together (sequentially or in parallel) to solve complex tasks.</p>
+
+<h3>Agent Architecture in PitchLens</h3>
+<pre><code># Each agent has: role, goal, backstory, tools, LLM config
+market_scorer = Agent(
+    role="Market Opportunity Analyst",
+    goal="Evaluate TAM/SAM/SOM, market timing, and growth potential",
+    backstory="You are a senior VC analyst who has evaluated 500+ pitch decks...",
+    llm=llm_config,
+)
+
+# A task binds an agent to specific work
+score_task = Task(
+    description="Score the market opportunity from 1-10...",
+    agent=market_scorer,
+    expected_output="JSON with score, reasoning, suggestions",
+)</code></pre>
+
+<h3>Why 4 Separate Agents?</h3>
+<table>
+<tr><th>Reason</th><th>Explanation</th></tr>
+<tr><td>Specialization</td><td>Each agent has a focused prompt optimized for one dimension</td></tr>
+<tr><td>Parallelism</td><td>4 agents run simultaneously — 4x faster than sequential</td></tr>
+<tr><td>Fault isolation</td><td>If one agent fails, others still produce results</td></tr>
+<tr><td>Testability</td><td>Each agent can be unit-tested independently</td></tr>
+</table>
+
+<h3>Key Lesson: Prompt Engineering for Agents</h3>
+<p>The quality of agent output depends heavily on:</p>
+<ul>
+    <li><strong>Role definition</strong> — "You are a senior VC analyst" vs "You are an AI assistant"</li>
+    <li><strong>Structured output</strong> — Tell the agent exactly what format to return (JSON schema)</li>
+    <li><strong>Grounding</strong> — "Base your analysis ONLY on the provided deck content"</li>
+    <li><strong>Constraints</strong> — "Score must be integer 1-10, reasoning must be 50-500 words"</li>
+</ul>
+
+<h2 id="orchestration">4. Pipeline Orchestration Patterns</h2>
+
+<h3>The Pipeline</h3>
+<pre><code>PDF Upload
+    → Extractor (sequential, must complete first)
+        → 4 Scorers (parallel, with retry)
+            → Verdict Aggregator (sequential, waits for all)
+                → Scorecard (persisted)</code></pre>
+
+<h3>Key Implementation: asyncio.as_completed()</h3>
+<pre><code>async def _run_all_scorers(extracted_content, analysis_id):
+    # Create tasks for parallel execution
+    tasks = {}
+    for scorer_name, scorer_fn in scorer_configs:
+        task = asyncio.create_task(
+            _run_scorer_with_retry(scorer_name, scorer_fn, extracted_content)
+        )
+        tasks[task] = scorer_name
+
+    # Process results AS THEY COMPLETE (not in order!)
+    scores = []
+    for completed_task in asyncio.as_completed(tasks.keys()):
+        scorer_name, score, error = await completed_task
+        if score:
+            scores.append(score)
+            # Stream partial result to frontend immediately
+            await ws_manager.emit_partial_result(analysis_id, score)
+    
+    return scores</code></pre>
+
+<div class="highlight">
+<strong>Key lesson:</strong> <code>asyncio.as_completed()</code> lets you process parallel tasks in completion order (not creation order). This enables real-time streaming of results as each agent finishes.
+</div>
+
+<h3>Retry Pattern</h3>
+<pre><code>async def _run_scorer_with_retry(scorer_name, scorer_fn, content):
+    for attempt in range(2):  # 0 = first try, 1 = retry
+        try:
+            result = await asyncio.wait_for(
+                scorer_fn(content),
+                timeout=120  # seconds
+            )
+            return (scorer_name, result, None)
+        except (asyncio.TimeoutError, Exception) as e:
+            if attempt == 0:
+                continue  # retry once
+            return (scorer_name, None, str(e))  # give up</code></pre>
+
+<h2 id="websocket">5. WebSocket Real-Time Streaming</h2>
+
+<h3>Why WebSocket over Polling?</h3>
+<ul>
+    <li>Server pushes events to client instantly (no 1-second polling delay)</li>
+    <li>Bidirectional — can be extended for real-time chat</li>
+    <li>Lower overhead than repeated HTTP requests</li>
+</ul>
+
+<h3>Backend: Event Broadcasting</h3>
+<pre><code>class WebSocketManager:
+    _connections: Dict[str, Set[WebSocket]] = {}
+    
+    async def emit_stage_change(self, analysis_id: str, stage: PipelineStage):
+        """Broadcast stage change to all connected clients for this analysis."""
+        event = WSEvent(event_type="stage_change", stage=stage, timestamp=now())
+        await self._broadcast(analysis_id, event)
+    
+    async def emit_partial_result(self, analysis_id: str, data: dict):
+        """Stream a scorer result as soon as it completes."""
+        event = WSEvent(event_type="partial_result", data=data, timestamp=now())
+        await self._broadcast(analysis_id, event)</code></pre>
+
+<h3>Frontend: Custom Hook</h3>
+<pre><code>function useAnalysisWebSocket(analysisId: string) {
+    const [state, setState] = useState({ currentStage: null, partialResults: [] });
+    
+    useEffect(() => {
+        const ws = new WebSocket(`ws://localhost:8002/ws/analysis/${analysisId}`);
+        
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            switch (data.event_type) {
+                case 'stage_change':
+                    setState(prev => ({ ...prev, currentStage: data.stage }));
+                    break;
+                case 'partial_result':
+                    setState(prev => ({
+                        ...prev,
+                        partialResults: [...prev.partialResults, data.data]
+                    }));
+                    break;
+                case 'complete':
+                    setState(prev => ({ ...prev, isComplete: true }));
+                    break;
+            }
+        };
+
+        return () => ws.close();
+    }, [analysisId]);
+    
+    return state;
+}</code></pre>
+
+<h3>Reconnection with Exponential Backoff</h3>
+<pre><code>// Attempt 1: wait 1s, Attempt 2: wait 2s, Attempt 3: wait 4s, then give up
+const backoffMs = 1000 * Math.pow(2, reconnectAttempt - 1);</code></pre>
+
+<h2 id="rag">6. RAG (Retrieval-Augmented Generation)</h2>
+
+<h3>What is RAG?</h3>
+<p>Instead of relying on the LLM's training data alone, you <strong>retrieve</strong> relevant documents, inject them as context, then <strong>generate</strong> an answer. This grounds the LLM in actual data.</p>
+
+<h3>RAG Pipeline</h3>
+<pre><code>User Question
+    → Embed the question (convert to vector)
+        → Search pgvector for similar deck chunks (cosine similarity)
+            → Retrieve top-K relevant chunks
+                → Construct prompt: "Based on these deck sections: {chunks}, answer: {question}"
+                    → LLM generates grounded answer
+                        → Return answer + cited sections</code></pre>
+
+<h3>Chunking Strategy</h3>
+<pre><code># Split deck content into ~500-token chunks with overlap
+chunks = split_text(extracted_content, chunk_size=500, overlap=50)
+
+# Store each chunk with its embedding
+for i, chunk in enumerate(chunks):
+    embedding = await get_embedding(chunk.text)  # 1536-dim vector
+    await db.execute(
+        insert(DeckEmbedding).values(
+            deck_id=deck_id,
+            chunk_text=chunk.text,
+            chunk_index=i,
+            section_category=chunk.category,
+            embedding=embedding,
+        )
+    )</code></pre>
+
+<h3>Retrieval Query</h3>
+<pre><code>-- pgvector cosine similarity search
+SELECT chunk_text, section_category,
+       1 - (embedding <=> query_embedding) AS similarity
+FROM deck_embeddings
+WHERE deck_id = $1
+ORDER BY embedding <=> query_embedding
+LIMIT 5;</code></pre>
+
+<div class="highlight">
+<strong>Key lesson:</strong> RAG quality depends on chunking strategy. Too small = loses context. Too large = dilutes relevance. 500 tokens with 50-token overlap is a good default.
+</div>
+
+<h2 id="auth">7. JWT Authentication</h2>
+
+<h3>Token Flow</h3>
+<pre><code>Login → Server issues Access Token (15 min) + Refresh Token (7 days)
+    → Client stores tokens
+        → Every API request: Authorization: Bearer {access_token}
+            → Token expires? Use refresh token to get new access token
+                → Refresh token expires? User must re-login</code></pre>
+
+<h3>Why Two Tokens?</h3>
+<table>
+<tr><th>Token</th><th>Lifetime</th><th>Purpose</th></tr>
+<tr><td>Access Token</td><td>15 min</td><td>Short-lived, used for every request. If stolen, limited damage window.</td></tr>
+<tr><td>Refresh Token</td><td>7 days</td><td>Long-lived, only sent to /refresh endpoint. Stored more securely.</td></tr>
+</table>
+
+<h3>Implementation</h3>
+<pre><code>import jwt
+from datetime import datetime, timedelta
+
+def create_access_token(user_id: str) -> str:
+    payload = {
+        "sub": user_id,
+        "exp": datetime.utcnow() + timedelta(minutes=15),
+        "iat": datetime.utcnow(),
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+def verify_token(token: str) -> dict:
+    try:
+        return jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(401, "Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(401, "Invalid token")</code></pre>
+
+<h2 id="security">8. Security Patterns</h2>
+
+<h3>Prompt Injection Guard</h3>
+<p>Users can try to manipulate AI agents by injecting instructions into their deck content or chat messages.</p>
+<pre><code># Patterns to detect:
+INJECTION_PATTERNS = [
+    r"ignore (all )?(previous|above) instructions",
+    r"you are now",
+    r"system prompt",
+    r"disregard",
+    r"\[INST\]",
+    r"&lt;/?(system|user|assistant)&gt;",
+]
+
+def scan(text: str) -> ScanResult:
+    for pattern in INJECTION_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            return ScanResult(allowed=False)  # BLOCK
+    return ScanResult(allowed=True)</code></pre>
+
+<h3>Fail-Closed Design</h3>
+<pre><code># If the guard itself crashes, we REJECT (not allow) the request
+try:
+    result = injection_scan(user_input)
+    if not result.allowed:
+        raise SecurityViolation()
+except Exception:
+    # Guard failed — reject the request rather than letting unscanned input through
+    raise HTTPException(503, "Service unavailable")</code></pre>
+
+<h3>Rate Limiting (Sliding Window)</h3>
+<pre><code># Track timestamps of requests per user
+# Window: last 60 seconds for general, last 3600 seconds for analysis
+user_requests = get_recent_requests(user_id, window=60)
+if len(user_requests) >= 60:
+    retry_after = calculate_retry_after(user_requests)
+    raise HTTPException(429, headers={"Retry-After": str(retry_after)})</code></pre>
+
+<h2 id="frontend">9. React + TypeScript Patterns</h2>
+
+<h3>React Hooks Rules (The Bug You Hit)</h3>
+<div class="highlight">
+<strong>NEVER put hooks after an early return.</strong> React counts hooks by position. If you call 5 hooks on render 1, then early-return before the 5th hook on render 2, React crashes with "Rendered fewer hooks than expected."
+</div>
+<pre><code>// ❌ WRONG — useMemo after early return
+function Component() {
+    const [data] = useState(null);
+    if (data) return &lt;Done /&gt;;  // early return
+    const value = useMemo(() => ..., []);  // 💥 CRASH — hook after return
+}
+
+// ✅ CORRECT — all hooks before any return
+function Component() {
+    const [data] = useState(null);
+    const value = useMemo(() => ..., []);  // all hooks first
+    if (data) return &lt;Done /&gt;;  // then early returns
+    return &lt;Loading /&gt;;
+}</code></pre>
+
+<h3>Custom WebSocket Hook Pattern</h3>
+<pre><code>// Encapsulate WebSocket logic in a reusable hook
+export function useAnalysisWebSocket(id: string | undefined) {
+    const [state, setState] = useState(initialState);
+    const wsRef = useRef&lt;WebSocket | null&gt;(null);
+    
+    useEffect(() => {
+        if (!id) return;
+        const ws = new WebSocket(url);
+        wsRef.current = ws;
+        ws.onmessage = (e) => { /* update state */ };
+        return () => ws.close();  // cleanup on unmount
+    }, [id]);
+    
+    return state;  // components just consume the state
+}</code></pre>
+
+<h3>CSS Variables for Theming</h3>
+<pre><code>/* Define tokens in CSS, use in Tailwind classes */
+:root {
+    --brand: #DC2626;
+    --surface-0: #ffffff;
+    --border: rgba(0,0,0,0.08);
+}
+.dark {
+    --surface-0: #09090b;
+    --border: rgba(255,255,255,0.06);
+}
+
+/* Use in components */
+&lt;div className="bg-[var(--surface-0)] border-[var(--border)]"&gt;</code></pre>
+
+<h2 id="db">10. PostgreSQL + pgvector</h2>
+
+<h3>Async SQLAlchemy</h3>
+<pre><code>from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+
+engine = create_async_engine("postgresql+asyncpg://...")
+async_session = sessionmaker(engine, class_=AsyncSession)
+
+async def get_db():
+    async with async_session() as session:
+        yield session  # auto-closes after request</code></pre>
+
+<h3>pgvector for Embeddings</h3>
+<pre><code># Store 1536-dimensional vectors alongside regular columns
+class DeckEmbedding(Base):
+    __tablename__ = "deck_embeddings"
+    id = Column(UUID, primary_key=True)
+    deck_id = Column(UUID, ForeignKey("decks.id"))
+    chunk_text = Column(Text)
+    embedding = Column(Vector(1536))  # pgvector type
+
+# Similarity search
+from sqlalchemy import text
+results = await session.execute(
+    text("""
+        SELECT chunk_text, 1 - (embedding <=> :query) as similarity
+        FROM deck_embeddings
+        WHERE deck_id = :deck_id
+        ORDER BY embedding <=> :query
+        LIMIT 5
+    """),
+    {"query": query_embedding, "deck_id": deck_id}
+)</code></pre>
+
+<h2 id="testing">11. Testing Strategy</h2>
+
+<h3>Testing Pyramid</h3>
+<pre><code>         ┌─────────────┐
+         │   E2E Tests  │  ← Few, slow, full user flows
+         ├─────────────┤
+         │ Integration  │  ← API contracts, DB queries
+         ├─────────────┤
+         │ Property-Based│  ← Hypothesis: universal invariants
+         ├─────────────┤
+         │  Unit Tests  │  ← Many, fast, pure functions
+         └─────────────┘</code></pre>
+
+<h3>Property-Based Testing (Hypothesis)</h3>
+<pre><code>from hypothesis import given, strategies as st
+
+@given(scores=st.lists(st.integers(min_value=1, max_value=10), min_size=1, max_size=4))
+def test_overall_score_is_mean(scores):
+    """For ANY set of valid scores, overall = rounded mean."""
+    result = compute_overall_score(scores)
+    expected = round(sum(scores) / len(scores))
+    assert result == expected
+    assert 1 <= result <= 10</code></pre>
+
+<h3>Mocking Agents in Tests</h3>
+<pre><code>@pytest.fixture
+def mock_scorers(monkeypatch):
+    """Replace real LLM agents with fast deterministic mocks."""
+    async def fake_score(content):
+        return CategoryScore(category="market", score=7, reasoning="...", suggestions=["..."])
+    
+    monkeypatch.setattr("app.services.orchestrator.score_market", fake_score)
+    monkeypatch.setattr("app.services.orchestrator.score_team", fake_score)
+    ...</code></pre>
+
+<h2 id="deployment">12. Deployment & DevOps</h2>
+
+<h3>Production Checklist</h3>
+<ul>
+    <li>✅ Environment variables (never commit secrets)</li>
+    <li>✅ HTTPS (required for WebSocket in production: wss://)</li>
+    <li>✅ Database migrations (don't rely on auto-create tables)</li>
+    <li>✅ CORS configured for your frontend domain</li>
+    <li>✅ Rate limiting (prevent abuse and cost overruns)</li>
+    <li>✅ Error logging (not just print statements)</li>
+    <li>✅ Health check endpoint for monitoring</li>
+</ul>
+
+<h3>Free Deployment Stack</h3>
+<table>
+<tr><th>Component</th><th>Service</th><th>Free Tier</th></tr>
+<tr><td>Frontend</td><td>Vercel / Netlify</td><td>Unlimited static sites</td></tr>
+<tr><td>Backend</td><td>Render / Railway</td><td>750 hours/month (cold starts)</td></tr>
+<tr><td>Database</td><td>Supabase / Render</td><td>500MB PostgreSQL</td></tr>
+<tr><td>LLM</td><td>OpenAI / Anthropic</td><td>Pay per use (no free tier)</td></tr>
+</table>
+
+<h2 id="resources">13. Resources & Further Reading</h2>
+
+<h3>FastAPI</h3>
+<ul>
+    <li><a href="https://fastapi.tiangolo.com/tutorial/">FastAPI Official Tutorial</a></li>
+    <li><a href="https://fastapi.tiangolo.com/advanced/websockets/">FastAPI WebSocket Guide</a></li>
+    <li><a href="https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html">SQLAlchemy Async Docs</a></li>
+</ul>
+
+<h3>Multi-Agent AI</h3>
+<ul>
+    <li><a href="https://docs.crewai.com/">CrewAI Documentation</a></li>
+    <li><a href="https://python.langchain.com/docs/langgraph">LangGraph Documentation</a></li>
+    <li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic: Building Effective Agents</a></li>
+</ul>
+
+<h3>RAG</h3>
+<ul>
+    <li><a href="https://github.com/pgvector/pgvector">pgvector GitHub</a></li>
+    <li><a href="https://cookbook.openai.com/examples/vector_databases/postgres/getting_started">OpenAI: pgvector Getting Started</a></li>
+    <li><a href="https://www.pinecone.io/learn/chunking-strategies/">Pinecone: Chunking Strategies</a></li>
+</ul>
+
+<h3>React + TypeScript</h3>
+<ul>
+    <li><a href="https://react.dev/learn">React Official Docs (new)</a></li>
+    <li><a href="https://www.typescriptlang.org/docs/handbook/">TypeScript Handbook</a></li>
+    <li><a href="https://tailwindcss.com/docs">Tailwind CSS Docs</a></li>
+</ul>
+
+<h3>Security</h3>
+<ul>
+    <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html">OWASP JWT Cheat Sheet</a></li>
+    <li><a href="https://simonwillison.net/2025/Apr/9/mcp-prompt-injection/">Simon Willison: Prompt Injection</a></li>
+    <li><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP Top 10 for LLMs</a></li>
+</ul>
+
+<h3>Design & UI</h3>
+<ul>
+    <li><a href="https://vercel.com/design/guidelines">Vercel Web Interface Guidelines</a></li>
+    <li><a href="https://linear.app/method">Linear Design Method</a></li>
+</ul>
+
+<hr>
+
+<p style="text-align:center; color: var(--muted); font-size: 13px; margin-top: 32px;">
+    Built during Tech Mahindra internship, Summer 2026.<br>
+    Sujal Kakkar — IIT (ISM) Dhanbad
+</p>
+
+</div>
+</body>
+</html>
