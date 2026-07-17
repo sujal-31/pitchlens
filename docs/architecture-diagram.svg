@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750" fill="none">
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .title { font-size: 22px; font-weight: 700; fill: #0f172a; }
+    .subtitle { font-size: 11px; fill: #64748b; font-weight: 500; letter-spacing: 0.5px; }
+    .layer-label { font-size: 11px; font-weight: 700; fill: #475569; letter-spacing: 1px; }
+    .box-label { font-size: 12px; font-weight: 600; fill: #1e293b; }
+    .box-sub { font-size: 10px; fill: #64748b; }
+    .arrow-label { font-size: 9px; fill: #94a3b8; font-weight: 500; }
+  </style>
+
+  <!-- Background -->
+  <rect width="1100" height="750" fill="#f8fafc" rx="12"/>
+
+  <!-- Title -->
+  <text x="550" y="36" text-anchor="middle" class="title">PitchLens — System Architecture</text>
+  <text x="550" y="52" text-anchor="middle" class="subtitle">MULTI-AGENT AI PITCH DECK ANALYSIS PLATFORM</text>
+
+  <!-- ═══════════ FRONTEND LAYER ═══════════ -->
+  <rect x="40" y="70" width="1020" height="90" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="60" y="88" class="layer-label">FRONTEND</text>
+  <text x="160" y="88" class="box-sub">React 19 + TypeScript + Tailwind CSS + Vite</text>
+
+  <!-- Frontend boxes -->
+  <rect x="60" y="100" width="120" height="44" rx="8" fill="white" stroke="#93c5fd" stroke-width="1"/>
+  <text x="120" y="121" text-anchor="middle" class="box-label">Login/Register</text>
+  <text x="120" y="135" text-anchor="middle" class="box-sub">Auth pages</text>
+
+  <rect x="200" y="100" width="120" height="44" rx="8" fill="white" stroke="#93c5fd" stroke-width="1"/>
+  <text x="260" y="121" text-anchor="middle" class="box-label">Upload</text>
+  <text x="260" y="135" text-anchor="middle" class="box-sub">PDF drag &amp; drop</text>
+
+  <rect x="340" y="100" width="140" height="44" rx="8" fill="white" stroke="#93c5fd" stroke-width="1"/>
+  <text x="410" y="121" text-anchor="middle" class="box-label">Analysis Progress</text>
+  <text x="410" y="135" text-anchor="middle" class="box-sub">WebSocket live UI</text>
+
+  <rect x="500" y="100" width="120" height="44" rx="8" fill="white" stroke="#93c5fd" stroke-width="1"/>
+  <text x="560" y="121" text-anchor="middle" class="box-label">Scorecard</text>
+  <text x="560" y="135" text-anchor="middle" class="box-sub">Results + gauges</text>
+
+  <rect x="640" y="100" width="120" height="44" rx="8" fill="white" stroke="#93c5fd" stroke-width="1"/>
+  <text x="700" y="121" text-anchor="middle" class="box-label">Chat (RAG)</text>
+  <text x="700" y="135" text-anchor="middle" class="box-sub">Follow-up Q&amp;A</text>
+
+  <rect x="780" y="100" width="120" height="44" rx="8" fill="white" stroke="#93c5fd" stroke-width="1"/>
+  <text x="840" y="121" text-anchor="middle" class="box-label">History</text>
+  <text x="840" y="135" text-anchor="middle" class="box-sub">Past evaluations</text>
+
+  <rect x="920" y="100" width="120" height="44" rx="8" fill="white" stroke="#93c5fd" stroke-width="1"/>
+  <text x="980" y="121" text-anchor="middle" class="box-label">Theme Toggle</text>
+  <text x="980" y="135" text-anchor="middle" class="box-sub">Dark / Light</text>
+
+  <!-- Connection arrows: Frontend → Backend -->
+  <path d="M 260 144 L 260 180 L 350 180 L 350 200" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#arrow)"/>
+  <text x="265" y="176" class="arrow-label">REST API</text>
+  <path d="M 410 144 L 410 180 L 550 180 L 550 200" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow-amber)"/>
+  <text x="455" y="176" class="arrow-label">WebSocket</text>
+
+  <!-- ═══════════ BACKEND LAYER ═══════════ -->
+  <rect x="40" y="200" width="1020" height="180" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="60" y="220" class="layer-label">BACKEND</text>
+  <text x="150" y="220" class="box-sub">FastAPI + Python 3.11+</text>
+
+  <!-- Middleware row -->
+  <rect x="60" y="232" width="130" height="40" rx="8" fill="white" stroke="#86efac" stroke-width="1"/>
+  <text x="125" y="252" text-anchor="middle" class="box-label">Auth Service</text>
+  <text x="125" y="265" text-anchor="middle" class="box-sub">JWT + bcrypt</text>
+
+  <rect x="205" y="232" width="130" height="40" rx="8" fill="white" stroke="#86efac" stroke-width="1"/>
+  <text x="270" y="252" text-anchor="middle" class="box-label">Rate Limiter</text>
+  <text x="270" y="265" text-anchor="middle" class="box-sub">Sliding window</text>
+
+  <rect x="350" y="232" width="140" height="40" rx="8" fill="white" stroke="#86efac" stroke-width="1"/>
+  <text x="420" y="252" text-anchor="middle" class="box-label">Injection Guard</text>
+  <text x="420" y="265" text-anchor="middle" class="box-sub">Prompt scanner</text>
+
+  <rect x="505" y="232" width="140" height="40" rx="8" fill="white" stroke="#86efac" stroke-width="1"/>
+  <text x="575" y="252" text-anchor="middle" class="box-label">WebSocket Mgr</text>
+  <text x="575" y="265" text-anchor="middle" class="box-sub">Progress stream</text>
+
+  <rect x="660" y="232" width="130" height="40" rx="8" fill="white" stroke="#86efac" stroke-width="1"/>
+  <text x="725" y="252" text-anchor="middle" class="box-label">RAG Engine</text>
+  <text x="725" y="265" text-anchor="middle" class="box-sub">pgvector + LLM</text>
+
+  <!-- Orchestrator (prominent) -->
+  <rect x="60" y="290" width="940" height="75" rx="10" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+  <text x="80" y="310" class="box-label" style="font-size:13px">Pipeline Orchestrator</text>
+  <text x="260" y="310" class="box-sub">Sequential extraction → Parallel scoring → Aggregation (120s timeout, 1 retry per scorer)</text>
+
+  <!-- Orchestrator internal flow -->
+  <rect x="80" y="320" width="110" height="34" rx="6" fill="white" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="135" y="341" text-anchor="middle" class="box-label">Extractor</text>
+
+  <!-- Arrow -->
+  <path d="M 190 337 L 220 337" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow-dark)"/>
+
+  <!-- Parallel scorers group -->
+  <rect x="220" y="316" width="480" height="42" rx="6" fill="#f0fdf4" stroke="#6ee7b7" stroke-width="1" stroke-dasharray="3 2"/>
+  <text x="230" y="330" class="box-sub" style="font-size:9px">PARALLEL</text>
+
+  <rect x="232" y="334" width="105" height="20" rx="4" fill="white" stroke="#a7f3d0"/>
+  <text x="284" y="348" text-anchor="middle" class="box-sub" style="font-size:10px;fill:#065f46">Market Scorer</text>
+
+  <rect x="345" y="334" width="95" height="20" rx="4" fill="white" stroke="#a7f3d0"/>
+  <text x="392" y="348" text-anchor="middle" class="box-sub" style="font-size:10px;fill:#065f46">Team Scorer</text>
+
+  <rect x="448" y="334" width="120" height="20" rx="4" fill="white" stroke="#a7f3d0"/>
+  <text x="508" y="348" text-anchor="middle" class="box-sub" style="font-size:10px;fill:#065f46">BizModel Scorer</text>
+
+  <rect x="576" y="334" width="115" height="20" rx="4" fill="white" stroke="#a7f3d0"/>
+  <text x="633" y="348" text-anchor="middle" class="box-sub" style="font-size:10px;fill:#065f46">Competition Scorer</text>
+
+  <!-- Arrow to aggregator -->
+  <path d="M 700 337 L 730 337" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow-dark)"/>
+
+  <rect x="730" y="320" width="130" height="34" rx="6" fill="white" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="795" y="341" text-anchor="middle" class="box-label">Verdict Aggregator</text>
+
+  <!-- Arrow to scorecard output -->
+  <path d="M 860 337 L 890 337 L 890 337 L 930 337" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow-dark)"/>
+  <rect x="930" y="324" width="60" height="26" rx="6" fill="#34d399" stroke="none"/>
+  <text x="960" y="342" text-anchor="middle" style="font-size:10px;fill:white;font-weight:600">Score</text>
+
+  <!-- ═══════════ DATA LAYER ═══════════ -->
+  <rect x="40" y="400" width="1020" height="100" rx="10" fill="#fef3c7" stroke="#fde68a" stroke-width="1.5"/>
+  <text x="60" y="420" class="layer-label">DATA LAYER</text>
+
+  <rect x="60" y="432" width="200" height="50" rx="8" fill="white" stroke="#fbbf24" stroke-width="1"/>
+  <text x="160" y="455" text-anchor="middle" class="box-label">PostgreSQL</text>
+  <text x="160" y="470" text-anchor="middle" class="box-sub">Users, Decks, Scorecards, Chat</text>
+
+  <rect x="280" y="432" width="200" height="50" rx="8" fill="white" stroke="#fbbf24" stroke-width="1"/>
+  <text x="380" y="455" text-anchor="middle" class="box-label">pgvector</text>
+  <text x="380" y="470" text-anchor="middle" class="box-sub">Embeddings for RAG</text>
+
+  <rect x="500" y="432" width="200" height="50" rx="8" fill="white" stroke="#fbbf24" stroke-width="1"/>
+  <text x="600" y="455" text-anchor="middle" class="box-label">File Storage</text>
+  <text x="600" y="470" text-anchor="middle" class="box-sub">Uploaded PDFs</text>
+
+  <!-- ═══════════ EXTERNAL LLM ═══════════ -->
+  <rect x="40" y="520" width="1020" height="70" rx="10" fill="#fce7f3" stroke="#fbcfe8" stroke-width="1.5"/>
+  <text x="60" y="540" class="layer-label">EXTERNAL</text>
+
+  <rect x="60" y="550" width="300" height="30" rx="8" fill="white" stroke="#f9a8d4" stroke-width="1"/>
+  <text x="210" y="570" text-anchor="middle" class="box-label">Claude Sonnet (via OpenAI-compatible proxy)</text>
+
+  <!-- Connection: Backend → Data -->
+  <path d="M 300 380 L 300 432" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+  <path d="M 550 380 L 550 432" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+
+  <!-- Connection: Backend → LLM -->
+  <path d="M 200 380 L 200 550" stroke="#e879a8" stroke-width="1.2" stroke-dasharray="4 2" marker-end="url(#arrow-pink)"/>
+  <text x="205" y="475" class="arrow-label">LLM calls</text>
+
+  <!-- ═══════════ PIPELINE FLOW (Bottom) ═══════════ -->
+  <rect x="40" y="610" width="1020" height="120" rx="10" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="60" y="632" class="layer-label">PIPELINE FLOW</text>
+  <text x="200" y="632" class="box-sub">End-to-end analysis lifecycle</text>
+
+  <!-- Flow steps -->
+  <rect x="60" y="650" width="100" height="55" rx="8" fill="#dbeafe" stroke="#93c5fd"/>
+  <text x="110" y="672" text-anchor="middle" style="font-size:16px">📄</text>
+  <text x="110" y="692" text-anchor="middle" class="box-sub" style="font-weight:600;fill:#1e40af">Upload PDF</text>
+
+  <path d="M 160 677 L 185 677" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-dark)"/>
+
+  <rect x="190" y="650" width="120" height="55" rx="8" fill="#fef3c7" stroke="#fbbf24"/>
+  <text x="250" y="672" text-anchor="middle" style="font-size:16px">🔍</text>
+  <text x="250" y="692" text-anchor="middle" class="box-sub" style="font-weight:600;fill:#92400e">Extract Text</text>
+
+  <path d="M 310 677 L 335 677" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-dark)"/>
+
+  <rect x="340" y="650" width="240" height="55" rx="8" fill="#dcfce7" stroke="#86efac"/>
+  <text x="460" y="672" text-anchor="middle" style="font-size:16px">⚡</text>
+  <text x="460" y="692" text-anchor="middle" class="box-sub" style="font-weight:600;fill:#065f46">Score (4 Agents in Parallel)</text>
+
+  <path d="M 580 677 L 605 677" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-dark)"/>
+
+  <rect x="610" y="650" width="130" height="55" rx="8" fill="#ede9fe" stroke="#c4b5fd"/>
+  <text x="675" y="672" text-anchor="middle" style="font-size:16px">🧮</text>
+  <text x="675" y="692" text-anchor="middle" class="box-sub" style="font-weight:600;fill:#5b21b6">Aggregate</text>
+
+  <path d="M 740 677 L 765 677" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-dark)"/>
+
+  <rect x="770" y="650" width="120" height="55" rx="8" fill="#fce4ec" stroke="#f9a8d4"/>
+  <text x="830" y="672" text-anchor="middle" style="font-size:16px">📊</text>
+  <text x="830" y="692" text-anchor="middle" class="box-sub" style="font-weight:600;fill:#9d174d">Scorecard</text>
+
+  <path d="M 890 677 L 915 677" stroke="#64748b" stroke-width="2" marker-end="url(#arrow-dark)"/>
+
+  <rect x="920" y="650" width="120" height="55" rx="8" fill="#ecfdf5" stroke="#6ee7b7"/>
+  <text x="980" y="672" text-anchor="middle" style="font-size:16px">💬</text>
+  <text x="980" y="692" text-anchor="middle" class="box-sub" style="font-weight:600;fill:#065f46">RAG Chat</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrow-dark" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arrow-pink" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M 0 0 L 8 4 L 0 8 Z" fill="#e879a8"/>
+    </marker>
+  </defs>
+</svg>
