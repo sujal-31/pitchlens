@@ -584,6 +584,192 @@ def mock_scorers(monkeypatch):
     <li><a href="https://linear.app/method">Linear Design Method</a></li>
 </ul>
 
+<h2 id="interview">14. Interview Q&A (Ready-Made Answers)</h2>
+
+<p>Questions an interviewer will likely ask about this project, with concise ready-to-speak answers.</p>
+
+<h3>Project Overview Questions</h3>
+
+<div class="card">
+<h4>Q: What does PitchLens do in one line?</h4>
+<p><strong>A:</strong> It's an AI platform that analyzes startup pitch deck PDFs and generates investor-grade scorecards across 4 dimensions — Market, Team, Business Model, and Competition — using parallel AI agents in under 60 seconds.</p>
+</div>
+
+<div class="card">
+<h4>Q: What was the business problem you were solving?</h4>
+<p><strong>A:</strong> Startups lack access to fast, affordable, investor-perspective feedback on pitch decks. Getting human expert feedback costs $500–2000 or takes days/weeks. PitchLens automates this with AI, delivering structured scorecards instantly.</p>
+</div>
+
+<div class="card">
+<h4>Q: Why multi-agent instead of a single LLM call?</h4>
+<p><strong>A:</strong> Three reasons: (1) <strong>Specialization</strong> — each agent has a focused prompt tuned for one dimension, producing better outputs than a generic "evaluate everything" prompt. (2) <strong>Parallelism</strong> — 4 agents run simultaneously, making it 4x faster. (3) <strong>Fault isolation</strong> — if one agent fails, the others still produce results, giving a partial scorecard rather than total failure.</p>
+</div>
+
+<div class="card">
+<h4>Q: Walk me through the architecture.</h4>
+<p><strong>A:</strong> User uploads a PDF → FastAPI backend stores it and kicks off a background pipeline → Extractor agent parses PDF into structured sections → 4 scoring agents run in parallel (with retry on failure) → Verdict Aggregator combines scores into a final scorecard → Results are persisted to PostgreSQL and streamed to the frontend in real-time via WebSocket. Users can then ask follow-up questions through a RAG-based chat grounded in the deck content.</p>
+</div>
+
+<h3>Technical Deep-Dive Questions</h3>
+
+<div class="card">
+<h4>Q: How do you handle real-time progress updates?</h4>
+<p><strong>A:</strong> WebSocket connection established when analysis starts. The orchestrator emits events at each stage transition (extracting, scoring_market, etc.) and streams partial results as each scorer completes. I use <code>asyncio.as_completed()</code> to process parallel tasks in completion order, enabling real-time streaming. Frontend has a custom React hook that maintains connection with exponential-backoff reconnection (3 attempts max).</p>
+</div>
+
+<div class="card">
+<h4>Q: How does the RAG chat work?</h4>
+<p><strong>A:</strong> After extraction, deck content is chunked into ~500-token segments and stored as vector embeddings in pgvector (1536-dim). When a user asks a question, I embed the query, do cosine similarity search to find the top-5 relevant chunks, construct a prompt with those chunks as context, and ask the LLM to answer grounded in that context. The response includes citations of which deck sections were referenced.</p>
+</div>
+
+<div class="card">
+<h4>Q: What happens if an agent fails?</h4>
+<p><strong>A:</strong> Each scorer gets one retry with a 120-second timeout. If both attempts fail, that category is marked as "failed" and the pipeline continues to aggregation with the available scores. The Verdict Aggregator handles partial inputs — it computes the overall score as a mean of available scores and notes which categories are missing. This is a graceful degradation pattern.</p>
+</div>
+
+<div class="card">
+<h4>Q: How do you handle security?</h4>
+<p><strong>A:</strong> Four layers: (1) JWT authentication with short-lived access tokens (15 min) and refresh tokens (7 days). (2) Prompt injection guard that pattern-matches user inputs before they reach agents — it's fail-closed, meaning if the guard itself errors, the request is rejected. (3) Rate limiting — 10 analyses/hour per user, 60 API calls/minute. (4) Data isolation — users can only access their own evaluations, 403 responses don't reveal resource existence.</p>
+</div>
+
+<div class="card">
+<h4>Q: Why async Python? What's the benefit?</h4>
+<p><strong>A:</strong> The pipeline involves heavy I/O waits (LLM API calls take 5-30 seconds each). With async, the event loop handles these concurrently — while one agent waits for LLM response, others can process. Without async, 4 sequential agent calls = 80s. With async parallel = ~20s. Also, WebSocket management requires async for non-blocking bidirectional communication.</p>
+</div>
+
+<div class="card">
+<h4>Q: Explain your database design choices.</h4>
+<p><strong>A:</strong> PostgreSQL with three key patterns: (1) Relational tables for users, decks, analyses, scorecards — standard normalized schema with foreign keys. (2) JSONB columns for flexible data (suggestions arrays, full scorecard JSON for round-trip storage). (3) pgvector extension for embedding storage — keeps vectors collocated with relational data, avoiding a separate vector DB infrastructure.</p>
+</div>
+
+<div class="card">
+<h4>Q: How did you handle the frontend state management for WebSocket?</h4>
+<p><strong>A:</strong> Custom React hook (<code>useAnalysisWebSocket</code>) encapsulates all WebSocket logic — connection, message parsing, reconnection, cleanup. It returns reactive state (currentStage, partialResults, isComplete) that components consume. I hit a React hooks bug early on — had a <code>useMemo</code> after an early return, which violated hooks rules and crashed the app. Fixed by moving ALL hooks above any conditional returns.</p>
+</div>
+
+<h3>Behavioral / Design Decision Questions</h3>
+
+<div class="card">
+<h4>Q: What was the hardest technical challenge?</h4>
+<p><strong>A:</strong> Getting the parallel agent orchestration right with real-time streaming. The challenge was: 4 agents finish at unpredictable times, each result needs to be streamed immediately to the frontend, failures need retries without blocking other agents, and the aggregator must wait for all to complete. I solved it with <code>asyncio.create_task()</code> + <code>asyncio.as_completed()</code> which processes tasks in completion order, letting me emit WebSocket events the instant each scorer finishes.</p>
+</div>
+
+<div class="card">
+<h4>Q: What trade-offs did you make?</h4>
+<p><strong>A:</strong> (1) In-memory rate limiting instead of Redis — simpler but doesn't work across multiple server instances. Acceptable for single-instance deployment. (2) PyPDF2 for PDF parsing — lightweight but can't handle scanned images (OCR). Chose speed of implementation over completeness. (3) Equal weighting for scoring dimensions — investors weight them differently, but equal weighting is a fair default without user research data.</p>
+</div>
+
+<div class="card">
+<h4>Q: If you had more time, what would you improve?</h4>
+<p><strong>A:</strong> (See Future Improvements section below.)</p>
+</div>
+
+<div class="card">
+<h4>Q: How did you test this?</h4>
+<p><strong>A:</strong> Three layers: (1) Unit tests for pure functions (score computation, color mapping, token validation). (2) Property-based tests with Hypothesis — e.g., "for ANY valid set of scores, the overall score equals the rounded mean." (3) Integration tests with mocked agents — test the full pipeline flow without hitting the real LLM. Agents are mocked at the module boundary using <code>monkeypatch</code>.</p>
+</div>
+
+<h3>Curveball Questions</h3>
+
+<div class="card">
+<h4>Q: What if someone uploads a malicious PDF?</h4>
+<p><strong>A:</strong> Defense in depth: (1) File type validation (must be valid PDF). (2) Size limits (20MB, 50 pages). (3) After extraction, the injection guard scans ALL extracted text before it reaches scoring agents. If injection patterns are detected, the pipeline aborts. (4) Fail-closed — if the guard itself fails, the request is rejected.</p>
+</div>
+
+<div class="card">
+<h4>Q: How would you scale this to 1000 concurrent users?</h4>
+<p><strong>A:</strong> (1) Move rate limiting to Redis (shared across instances). (2) Run multiple FastAPI instances behind a load balancer. (3) Use a task queue (Celery/RQ) for pipeline execution instead of background tasks. (4) Cache scorecard results. (5) WebSocket connections via Redis pub/sub for multi-instance broadcasting. (6) Consider serverless for the scoring agents (each is stateless and independent).</p>
+</div>
+
+<div class="card">
+<h4>Q: Why not use LangChain instead of CrewAI?</h4>
+<p><strong>A:</strong> CrewAI provides agent composition with roles, goals, and backstories out of the box — it's purpose-built for multi-agent systems. LangChain is more general-purpose (chains, tools, memory). For a team of specialized agents working on a shared task, CrewAI's abstractions fit better. That said, LangGraph (LangChain's agent framework) would also work well and offers more control over state machines.</p>
+</div>
+
+<h2 id="future">15. Future Improvements</h2>
+
+<p>Things you'd build if you continued working on this:</p>
+
+<h3>High Priority</h3>
+<table>
+<tr><th>Improvement</th><th>Why</th><th>How</th></tr>
+<tr><td>OCR support for image-heavy decks</td><td>Many pitch decks are designed in Canva/Figma — exported as images, not text</td><td>Add Tesseract OCR or AWS Textract as fallback when PyPDF2 finds no text</td></tr>
+<tr><td>Custom scoring rubrics</td><td>Different investors weight dimensions differently</td><td>Let users define custom weights and criteria per dimension</td></tr>
+<tr><td>Deck comparison (v1 vs v2)</td><td>Founders iterate — they need to see what improved</td><td>Diff two scorecards side-by-side, highlight score changes</td></tr>
+<tr><td>Export to PDF report</td><td>Users want to share results with co-founders/advisors</td><td>Use puppeteer/playwright to render the scorecard page as PDF</td></tr>
+</table>
+
+<h3>Medium Priority</h3>
+<table>
+<tr><th>Improvement</th><th>Why</th><th>How</th></tr>
+<tr><td>Multi-user collaboration</td><td>Co-founders need shared access</td><td>Add team/workspace concept, shared deck ownership</td></tr>
+<tr><td>Benchmark against successful decks</td><td>"How does my deck compare to funded startups?"</td><td>Build a reference dataset of scored decks, show percentile ranking</td></tr>
+<tr><td>Slide-level annotations</td><td>Feedback on specific slides, not just dimensions</td><td>Map extracted content back to page numbers, render inline feedback</td></tr>
+<tr><td>Email notifications</td><td>Analysis takes 60s — user might navigate away</td><td>Send email when scorecard is ready with link</td></tr>
+<tr><td>Agent observability</td><td>Debug why an agent scored low / understand its reasoning chain</td><td>Log full agent thought process, show "reasoning trace" in UI</td></tr>
+</table>
+
+<h3>Technical Debt / Infrastructure</h3>
+<table>
+<tr><th>Improvement</th><th>Why</th><th>How</th></tr>
+<tr><td>Redis for rate limiting</td><td>In-memory doesn't survive restarts or scale horizontally</td><td>Replace sliding window implementation with Redis sorted sets</td></tr>
+<tr><td>Task queue (Celery)</td><td>Background tasks are lost on server restart</td><td>Use Celery + Redis/RabbitMQ for durable task execution</td></tr>
+<tr><td>Database migrations (Alembic)</td><td>Schema changes need to be versioned</td><td>Add Alembic for proper migration management</td></tr>
+<tr><td>CI/CD pipeline</td><td>Manual deployment is error-prone</td><td>GitHub Actions: lint → test → build → deploy on push to main</td></tr>
+<tr><td>Docker Compose for local dev</td><td>Setting up PostgreSQL manually is friction</td><td>docker-compose.yml with app + postgres + pgvector services</td></tr>
+<tr><td>Structured logging</td><td>Print statements don't scale</td><td>Use structlog or python-json-logger with correlation IDs per request</td></tr>
+</table>
+
+<h3>AI/ML Improvements</h3>
+<table>
+<tr><th>Improvement</th><th>Why</th><th>How</th></tr>
+<tr><td>Fine-tuned scoring model</td><td>Generic LLM doesn't know what real investors look for</td><td>Fine-tune on actual VC feedback data (if available)</td></tr>
+<tr><td>Multi-model consensus</td><td>Single model has biases</td><td>Run 2-3 different models, aggregate scores for robustness</td></tr>
+<tr><td>Confidence scores</td><td>User should know when the AI is uncertain</td><td>Ask agent to self-rate confidence, show in UI</td></tr>
+<tr><td>Adaptive prompts</td><td>Different deck styles need different evaluation approaches</td><td>Classify deck type first (B2B SaaS, consumer, deep tech), use tailored prompts</td></tr>
+</table>
+
+<h2 id="resources-ext">16. Extended Learning Resources</h2>
+
+<h3>Books</h3>
+<ul>
+    <li><strong>"Designing Data-Intensive Applications"</strong> — Martin Kleppmann (system design bible)</li>
+    <li><strong>"Building LLM Applications"</strong> — Covers RAG, agents, fine-tuning patterns</li>
+    <li><strong>"Clean Architecture"</strong> — Robert C. Martin (for project structure thinking)</li>
+</ul>
+
+<h3>Courses</h3>
+<ul>
+    <li><a href="https://www.deeplearning.ai/short-courses/multi-ai-agent-systems-with-crewai/">DeepLearning.ai: Multi AI Agent Systems with CrewAI</a> (free, 1 hour)</li>
+    <li><a href="https://www.deeplearning.ai/short-courses/langchain-chat-with-your-data/">DeepLearning.ai: LangChain Chat with Your Data</a> (RAG fundamentals)</li>
+    <li><a href="https://www.deeplearning.ai/short-courses/building-agentic-rag-with-llamaindex/">DeepLearning.ai: Building Agentic RAG</a></li>
+    <li><a href="https://fullstackopen.com/en/">Full Stack Open</a> (React, Node, TypeScript — comprehensive)</li>
+</ul>
+
+<h3>YouTube</h3>
+<ul>
+    <li><strong>Fireship</strong> — Quick tech explainers (FastAPI in 100 seconds, etc.)</li>
+    <li><strong>ArjanCodes</strong> — Python design patterns, FastAPI best practices</li>
+    <li><strong>Theo (t3.gg)</strong> — React/TypeScript/Next.js ecosystem</li>
+    <li><strong>AI Jason</strong> — Multi-agent systems, RAG implementations</li>
+</ul>
+
+<h3>Blogs & Newsletters</h3>
+<ul>
+    <li><a href="https://www.anthropic.com/research">Anthropic Research Blog</a> — Agent design, prompt engineering</li>
+    <li><a href="https://simonwillison.net/">Simon Willison's Blog</a> — LLM applications, security</li>
+    <li><a href="https://newsletter.pragmaticengineer.com/">The Pragmatic Engineer</a> — System design, engineering culture</li>
+    <li><a href="https://blog.bytebytego.com/">ByteByteGo</a> — System design visual explainers</li>
+</ul>
+
+<h3>Practice</h3>
+<ul>
+    <li><a href="https://leetcode.com">LeetCode</a> — DSA for placement interviews</li>
+    <li><a href="https://neetcode.io">NeetCode</a> — Curated 150 problems with video solutions</li>
+    <li><a href="https://github.com/donnemartin/system-design-primer">System Design Primer</a> — GitHub (100k+ stars)</li>
+    <li><a href="https://roadmap.sh">roadmap.sh</a> — Visual learning paths for any tech role</li>
+</ul>
+
 <hr>
 
 <p style="text-align:center; color: var(--muted); font-size: 13px; margin-top: 32px;">
